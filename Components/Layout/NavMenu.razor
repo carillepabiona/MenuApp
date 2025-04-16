@@ -1,0 +1,56 @@
+﻿@inject NavigationManager Navl
+<style>
+    .fa-home {
+        color: black;
+    }
+
+    .fa-truck {
+        color: black;
+    }
+
+    .fa-heart {
+        color: black;
+    }
+
+    .nav-link {
+        color: black;
+    }
+
+        .nav-link:hover {
+            color: darkgreen; /* or use a hex code like #006400 */
+        }
+</style>
+<nav class="mobile-nav" onclick="hideMenu()">
+    <ul>
+        <li>
+            <a class="nav-link" href="">
+                <i class="fa fa-home"></i>&nbsp;Start
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="/home">
+                <i class="fa fa-home"></i>&nbsp;Menu
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="addtocart">
+                <i class="fa-solid fa-heart"></i>&nbsp;Add To Cart
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="myorder">
+                <i class="fa fa-truck"></i>&nbsp;My Order
+            </a>
+        </li>
+        <li>
+            <a class="nav-link" href="promos">
+                <i class="fa-solid fa-heart"></i>&nbsp;Promos
+            </a>
+        </li>
+
+    </ul>
+</nav>
+
+@code {
+
+}

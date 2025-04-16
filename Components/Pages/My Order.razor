@@ -1,0 +1,103 @@
+﻿@page "/myorder"
+@inject DatabaseService DB
+@inject NavigationManager NavigationManager
+@using MenuApp.Service;
+@using MenuApp.Models
+@using System.Linq
+
+<head>
+    <link rel="stylesheet" href="orderStyle.css">
+</head>
+<PageTitle>My Orders</PageTitle>
+
+<h3>Your Orders</h3>
+
+@if (orderItems == null || !orderItems.Any())
+{
+    <p>You don't have any orders yet.</p>
+}
+else
+{
+    <div class="order-items">
+        @foreach (var order in orderItems)
+        {
+            <div class="order-item">
+                <img src="@order.Image" alt="@order.Name" class="order-item-img" />
+                <div class="order-item-details">
+                    <h5>@order.Name</h5>
+                    <p>₱ @order.Price.ToString("F2")</p>
+                    <p>Quantity: @order.Quantity</p>
+                    <p>Status: <span class="order-status">@order.Status</span></p>
+
+                    @if (order.Status != "Order Received")
+                    {
+                        <div class="status-actions">
+                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Preparing"))">Preparing</button>
+                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Delivering"))">Delivering</button>
+                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Order Received"))">Order Received</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        @if (orderItems != null && orderItems.Any())
+        {
+            <div class="order-summary-footer">
+                <div class="order-total">
+                    <strong>Total:</strong> ₱ @orderItems.Sum(item => item.Price * item.Quantity).ToString("F2")
+                </div>
+                <button class="bill-out-button" @onclick="BillOut">Bill Out</button>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(notificationMessage))
+        {
+            <div class="notification">
+                <p>@notificationMessage</p>
+            </div>
+        }
+    </div>
+
+}
+
+@code {
+    private List<OrderItem> orderItems;
+    private string notificationMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOrders();
+    }
+
+    private async Task LoadOrders()
+    {
+        // Load orders from the database
+        orderItems = await DB.GetOrderItemsAsync();
+    }
+
+    private async Task UpdateOrderStatus(OrderItem order, string newStatus)
+    {
+        // Update the status of the order in the database
+        await DB.UpdateOrderStatusAsync(order.Id, newStatus);
+
+        // Reload orders to reflect the updated status
+        await LoadOrders();
+    }
+
+    private async Task SetOrderStatus(OrderItem order, string status)
+    {
+        await UpdateOrderStatus(order, status);
+    }
+    private async Task BillOut()
+    {// Show notification first
+        notificationMessage = "Our staff is on the way to bring your bill";
+        StateHasChanged(); // Refresh UI to show notification
+
+        await Task.Delay(2500); // Wait 2.5 seconds
+
+        // Clear orders
+        await DB.DeleteAllOrdersAsync();
+
+        // Redirect to the /start page after clearing the orders
+        NavigationManager.NavigateTo("/");
+    }
+}

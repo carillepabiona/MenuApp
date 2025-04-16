@@ -1,0 +1,67 @@
+﻿@inherits LayoutComponentBase
+@inject DatabaseService DB
+@using MenuApp.Service;
+
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Layout</title>
+    <link rel="stylesheet" href="MainStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="page">
+
+    <main>
+        <div class="topbar">
+            <span class="leftside">
+                <button id="btnMenu" class="btn text-primary" style="color:white" href="javascript:void(0)" onclick="toggleMenu()">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <button id="btnMenuClose" style="display:none" class="btn text-danger" href="javascript:void(0)" onclick="$('.mobile-nav').toggleClass('open');$('#btnMenu').toggle();$('#btnMenuClose').toggle()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </span>
+
+            <span class="rightside">
+                <SectionOutlet SectionName="page-buttons" />                
+            </span>
+        </div>
+        <NavMenu />
+        <article class="content px-4" onclick="hideMenu()" style="margin-top: 70px;">
+            @Body
+        </article>
+    </main>
+</div>
+
+</body>
+<script>
+    function toggleMenu() {
+        $('.mobile-nav').toggleClass('open');
+        $('#btnMenu').toggle();
+        $('#btnMenuClose').toggle();
+    }
+
+    function showMenu() {
+        $('.mobile-nav').addClass('open');
+        $('#btnMenu').hide();
+        $('#btnMenuClose').show();
+    }
+
+    function hideMenu() {
+        $('.mobile-nav').removeClass('open');
+        $('#btnMenu').show();
+        $('#btnMenuClose').hide();
+    }
+</script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await DB.Init();
+    }
+}

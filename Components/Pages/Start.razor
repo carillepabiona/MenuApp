@@ -1,0 +1,48 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+<style>
+    .start-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: url('/your_background_image.jpg') no-repeat center center/cover;
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .start-btn {
+        font-size: 2rem;
+        padding: 20px 50px;
+        background-color: rgba(255, 111, 0, 0.9);
+        border: none;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+        }
+
+</style>
+
+<head>
+    <link rel="stylesheet" href="homeStyles.css">
+</head>
+<div class="start-page">
+    <button class="start-btn" @onclick="StartOrdering">Start Ordering</button>
+</div>
+
+@code {
+    void StartOrdering()
+    {
+        Navigation.NavigateTo("/home");
+    }
+}

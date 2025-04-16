@@ -1,0 +1,354 @@
+﻿@page "/home"
+@using MenuApp.Models
+@inject CartService CartService
+@inject NavigationManager Navigation
+@using System.Net;
+@using System.Net.Sockets;
+@using System.Text;
+@using System.Threading.Tasks;
+@inject IJSRuntime JSRuntime
+@inject IJSRuntime JS
+@using MenuApp.Service;
+
+
+<head>
+    <link rel="stylesheet" href="homeStyle.css">
+    <script src="js/script.js"></script>
+    <script src="js/jquery.cycle2.js"></script>
+</head>
+
+
+<SectionContent SectionName="page-buttons">
+    <div class="search-cart-wrapper d-flex justify-between align-items-center">
+        <div id="searchBox" class="input-group header-search" style="display:none; width:500px;">
+            <span class="input-group-text text-warning"><i class="fa fa-search"></i></span>
+            <input id="txtSearch" type="text" class="form-control" placeholder="Search" value="@searchText" @oninput="SearchTerm" />
+            <span class="input-group-text" @onclick="HideSearchBox"><i class="fa fa-times"></i></span>
+        </div>
+
+        <div class="search-cart-left">
+            <span id="controlBox">
+                <button class="btn text-warning" @onclick="ShowSearchBox">
+                    <i class="fa fa-search"></i>
+                </button>
+            </span>
+        </div>
+        <div id="toast" class="toast">Item added to cart!</div>
+        <div class="search-cart-right d-flex align-items-center gap-3">
+            <div style="position: relative; cursor: pointer;" @onclick="@GoToCart">
+                <i class="fa fa-shopping-cart cart-icon" style="font-size: 30px;"></i>
+                @if (CartService.GetCartCount() > 0)
+                {
+                    <span class="cart-badge">@CartService.GetCartCount()</span>
+                }
+            </div>
+             <button class="chat-toggle" onclick="toggleChat(event)" style="background: none; border: none;">
+                <i class="fa-regular fa-comment-dots" style="font-size: 24px; color: black;"></i>
+                <span id="chatBadge" class="dot" style="display: none;"></span>
+            </button>
+        </div>
+    </div>
+</SectionContent>
+
+<!-- Chat Sidebar -->
+<div id="chatSidebar" class="chat-sidebar" style="background-color: #FFECB3; border: 3px solid #FF6F00; width: 300px; height: 380px">
+    <div class="chat-header" onclick="toggleChat()" style="background-color: #FF6F00; color: white; padding: 10px; font-size: 18px; border-radius:4px;">
+        Chat Box
+    </div>
+    <div class="chat-content" id="chatContent" style="height: 250px; width: 100%; overflow-y: auto; padding: 10px; background-color: #FFF3E0;">
+        @foreach (var msg in Messages)
+        {
+            <div style="color: #5D4037; padding: 5px 0;">@msg</div>
+        }
+    </div>
+    <div class="chat-input" style="padding: 5px; background-color: #FFECB3; margin: 5px;">
+        <input @bind="OutgoingMessage" type="text" placeholder="Type a message..."
+               style="width: 200px; padding: 10px; font-size: 16px; border: 1px solid #FF6F00; border-radius: 5px; margin: 5px;" />
+        <button @onclick="SendMessageToSender"
+                style="background-color: #FF6F00; color: white; font-size: 16px; border: none; border-radius: 5px; margin-top: 5px; padding: 10px;">
+            Send
+        </button>
+    </div>
+</div>
+
+
+<!-- Category -->
+<div class="category-scroll-container">
+    <button class="category-button @(SelectedCategory == "All" ? "selected" : "")"
+            @onclick='() => SelectCategory("All")'>
+        All
+    </button>
+
+    @foreach (var category in FoodCategories)
+    {
+        <button class="category-button @(SelectedCategory == category.Name ? "selected" : "")"
+                @onclick='() => SelectCategory(category.Name)'>
+            @category.DisplayName
+        </button>
+    }
+</div>
+
+<!-- Food Grid -->
+<div class="food-grid">
+    @foreach (var item in FilteredFoodItems)
+    {
+        <div class="food-card" @onclick="() => ShowDetail(item)">
+            <img src="@item.Image" alt="@item.Name" class="food-img" />
+            <div class="food-body">
+                <p class="food-name">@item.Name</p>
+                <div class="spacer"></div>
+                <p class="food-price">₱ @item.Price.ToString("F2")</p>
+            </div>
+        </div>
+    }
+</div>
+@if (SelectedFoodItem != null)
+{
+    <div class="food-detail-overlay" @onclick="HandleOverlayClick">
+        <div class="popup-content" @onclick:stopPropagation>
+            <!-- Close Button -->
+            <button class="close-button" @onclick="CloseDetail">×</button>
+
+            <!-- Top Section -->
+            <div class="popup-top">
+                <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
+                <div class="popup-info">
+                    <p style="font-size:25px; font-weight:bold;">@SelectedFoodItem.Name</p>
+                    <p>@SelectedFoodItem.Description</p>
+                    <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
+                    <div class="quantity-controls">
+                        <button @onclick="DecreaseQuantity">-</button>
+                        <span>@SelectedQuantity</span>
+                        <button @onclick="IncreaseQuantity">+</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer Section -->
+            <div class="popup-footer">
+                <button @onclick="AddToCart">Add to Cart</button>
+                <button @onclick="OrderNow">Order Now</button>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+    private string SelectedCategory = "All";
+    List<BestSellingItem> TopItems = new();
+    private void SelectCategory(string category)
+    {
+        SelectedCategory = category;
+        if (category == "All")
+        {
+            ShowAllItems();
+        }
+        else
+        {
+            FilterCategory(category);
+        }
+    }
+    ///////////////////// SEARCH /////////////////////
+    private string searchText;
+
+    private void SearchTerm(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString();
+        SearchFood(); // 👈 Add this line to trigger filtering
+    }
+
+    private void ShowSearchBox()
+    {
+        JS.InvokeVoidAsync("showSearchBox");
+    }
+
+    private void HideSearchBox()
+    {
+        JS.InvokeVoidAsync("hideSearchBox");
+    }
+
+    private void ClearSearch()
+    {
+        searchText = string.Empty;
+        SearchFood(); // 👈 Add this line to reset the food list when clearing search
+    }
+
+    private void SearchFood()
+    {
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            FilteredFoodItems = FoodItems;
+        }
+        else
+        {
+            FilteredFoodItems = FoodItems
+                .Where(item => item.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
+    ///////////////////// CATEGORY /////////////////////  /////////////////////  /////////////////////  /////////////////////
+
+    private List<FoodCategory> FoodCategories = FoodCategoryData.GetFoodCategories();
+    private List<FoodItem> FoodItems = FoodItemData.GetFoodItems();
+    private List<FoodItem> FilteredFoodItems { get; set; } = new();
+
+    private void FilterCategory(string category)
+    {
+        FilteredFoodItems = FoodItems
+            .Where(item => item.Category.Equals(category, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private void ShowAllItems()
+    {
+        searchText = string.Empty;
+        FilteredFoodItems = FoodItems;
+    }
+    private FoodItem? SelectedFoodItem;
+
+    private void ShowDetail(FoodItem item)
+    {
+        SelectedFoodItem = item;
+    }
+
+    private void CloseDetail()
+    {
+        SelectedFoodItem = null;
+    }
+
+
+    private int SelectedQuantity = 1;
+    [Inject] private NavigationManager Nav { get; set; }
+    [Inject] private DatabaseService DB { get; set; }
+
+    
+    private void DecreaseQuantity() => SelectedQuantity = Math.Max(1, SelectedQuantity - 1);
+    private void IncreaseQuantity() => SelectedQuantity++;
+
+    private void HandleOverlayClick()
+    {
+        CloseDetail();
+    }
+    
+    private async Task AddToCart()
+    {
+        var item = new CartItem
+            {
+                Name = SelectedFoodItem.Name,
+                Image = SelectedFoodItem.Image,
+                Price = SelectedFoodItem.Price,
+                Quantity = SelectedQuantity
+            };
+
+        await DB.AddCartItemAsync(item);
+        CloseDetail(); // 👈 Close the popup
+
+        await JSRuntime.InvokeVoidAsync("showToast", $"{item.Name} added to cart!"); // 👈 Show notification
+        StateHasChanged();
+    }
+    private async Task OrderNow()
+    {
+        var item = new OrderItem
+            {
+                Name = SelectedFoodItem.Name,
+                Image = SelectedFoodItem.Image,
+                Price = SelectedFoodItem.Price,
+                Quantity = SelectedQuantity,
+                Status = "Food Preparing"
+            };
+
+        await DB.AddOrderItemAsync(item);
+        Nav.NavigateTo("/myorder");
+    }
+
+    private void GoToCart()
+    {
+        Navigation.NavigateTo("/addtocart");
+    }
+    protected override void OnInitialized()
+    {
+        CartService.OnChange += StateHasChanged;
+    }
+    public void Dispose()
+    {
+        CartService.OnChange -= StateHasChanged;
+    }
+   
+    /////////////////////  CHAT BOX /////////////////////  /////////////////////  /////////////////////  /////////////////////
+
+    private TcpListener _listener;
+    private const int Port = 5000;
+    private List<string> Messages = new();
+    private string OutgoingMessage = "";
+
+    private const string SenderIP = "192.168.254.106"; // Update to actual sender IP
+    private const int SenderPort = 5000;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await StartListening();
+        SelectCategory("All");
+    }
+
+    private async Task StartListening()
+    {
+        try
+        {
+            _listener = new TcpListener(IPAddress.Any, Port);
+            _listener.Start();
+
+            while (true)
+            {
+                var client = await _listener.AcceptTcpClientAsync();
+                _ = HandleClient(client);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task HandleClient(TcpClient client)
+    {
+        try
+        {
+            using var stream = client.GetStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+            string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+            Messages.Add($"Sender: {message}");
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Client handling error: {ex.Message}");
+        }
+    }
+
+    private async Task SendMessageToSender()
+    {
+        if (!string.IsNullOrWhiteSpace(OutgoingMessage))
+        {
+            try
+            {
+                using var client = new TcpClient();
+                await client.ConnectAsync(SenderIP, SenderPort);
+
+                using var stream = client.GetStream();
+                byte[] data = Encoding.UTF8.GetBytes(OutgoingMessage);
+                await stream.WriteAsync(data, 0, data.Length);
+
+                Messages.Add($"You: {OutgoingMessage}");
+                OutgoingMessage = "";
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Sending error: {ex.Message}");
+            }
+        }
+    }
+}

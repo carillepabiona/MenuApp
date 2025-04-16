@@ -1,0 +1,108 @@
+﻿@page "/addtocart"
+@inject DatabaseService DB
+@inject NavigationManager Navigation
+@using MenuApp.Service;
+@using SQLite
+@using MenuApp.Models
+@using System.Linq
+
+<PageTitle>Cart</PageTitle>
+<head>
+    <link rel="stylesheet" href="cartStyle.css">
+</head>
+<h3>Your Cart</h3>
+
+@if (cartItems == null || !cartItems.Any())
+{
+    <p>Your cart is empty.</p>
+}
+else
+{
+    <div class="cart-items">
+        @foreach (var item in cartItems)
+        {
+            <div class="cart-item">
+                <img src="@item.Image" alt="@item.Name" class="cart-item-img" />
+                <div class="cart-item-details">
+                    <h5>@item.Name</h5>
+                    <p>₱ @item.Price.ToString("F2")</p>
+                    <div class="quantity-control">
+                        <button @onclick="() => UpdateQuantity(item, item.Quantity - 1)">-</button>
+                        <span>@item.Quantity</span>
+                        <button @onclick="() => UpdateQuantity(item, item.Quantity + 1)">+</button>
+                    </div>
+                    <button class="remove-btn" @onclick="() => RemoveFromCart(item.Id)">Remove</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="cart-footer">
+        <h4>Total: ₱ @totalPrice.ToString("F2")</h4>
+        <button class="order-now-btn" @onclick="PlaceOrder">Order Now</button>
+    </div>
+}
+
+@code {
+    private List<CartItem> cartItems;
+    private decimal totalPrice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCartItems();
+    }
+
+    private async Task LoadCartItems()
+    {
+        // Load cart items from the database
+        cartItems = await DB.GetCartItemsAsync();
+
+        // Calculate the total price
+        totalPrice = cartItems.Sum(item => item.Price * item.Quantity);
+    }
+
+    private async Task UpdateQuantity(CartItem item, int newQuantity)
+    {
+        if (newQuantity < 1) return; // Prevent negative quantity
+
+        // Update the quantity of the item in the database
+        item.Quantity = newQuantity;
+        await DB.UpdateCartItemAsync(item);
+
+        // Reload cart items to reflect the changes
+        await LoadCartItems();
+    }
+
+    private async Task RemoveFromCart(int itemId)
+    {
+        // Remove the item from the database
+        await DB.RemoveCartItemAsync(itemId);
+
+        // Reload cart items to reflect the changes
+        await LoadCartItems();
+    }
+
+    private async Task PlaceOrder()
+    {
+        // Move cart items to orders and set status to "Preparing"
+        foreach (var item in cartItems)
+        {
+            var orderItem = new OrderItem
+                {
+                    Name = item.Name,
+                    Price = item.Price,
+                    Quantity = item.Quantity,
+                    Status = "Preparing",
+                    Image = item.Image
+                };
+
+            await DB.AddOrderItemAsync(orderItem);
+        }
+
+        // Clear the cart after placing the order
+        await DB.ClearCartAsync();
+
+        // Redirect to the orders page
+        Navigation.NavigateTo("/myorder");
+    }
+}
