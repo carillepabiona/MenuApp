@@ -10,7 +10,12 @@
 </head>
 <PageTitle>My Orders</PageTitle>
 
+<div class="orders-header">
+    <a href="/home" class="back-to-home">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
 <h3>Your Orders</h3>
+</div>
 
 @if (orderItems == null || !orderItems.Any())
 {
@@ -28,15 +33,6 @@ else
                     <p>₱ @order.Price.ToString("F2")</p>
                     <p>Quantity: @order.Quantity</p>
                     <p>Status: <span class="order-status">@order.Status</span></p>
-
-                    @if (order.Status != "Order Received")
-                    {
-                        <div class="status-actions">
-                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Preparing"))">Preparing</button>
-                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Delivering"))">Delivering</button>
-                            <button class="update-status-btn" @onclick="@(() => SetOrderStatus(order, "Order Received"))">Order Received</button>
-                        </div>
-                    }
                 </div>
             </div>
         }
@@ -46,7 +42,7 @@ else
                 <div class="order-total">
                     <strong>Total:</strong> ₱ @orderItems.Sum(item => item.Price * item.Quantity).ToString("F2")
                 </div>
-                <button class="bill-out-button" @onclick="BillOut">Bill Out</button>
+                        <button class="bill-out-btn" @onclick="BillOut">Bill Out</button>
             </div>
         }
         @if (!string.IsNullOrEmpty(notificationMessage))
@@ -56,7 +52,6 @@ else
             </div>
         }
     </div>
-
 }
 
 @code {
@@ -74,19 +69,6 @@ else
         orderItems = await DB.GetOrderItemsAsync();
     }
 
-    private async Task UpdateOrderStatus(OrderItem order, string newStatus)
-    {
-        // Update the status of the order in the database
-        await DB.UpdateOrderStatusAsync(order.Id, newStatus);
-
-        // Reload orders to reflect the updated status
-        await LoadOrders();
-    }
-
-    private async Task SetOrderStatus(OrderItem order, string status)
-    {
-        await UpdateOrderStatus(order, status);
-    }
     private async Task BillOut()
     {// Show notification first
         notificationMessage = "Our staff is on the way to bring your bill";
