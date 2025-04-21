@@ -23,6 +23,18 @@ namespace MenuApp
     		builder.Logging.AddDebug();
             builder.Services.AddSingleton<CartService>();
             builder.Services.AddSingleton<DatabaseService>();
+            builder.Services.AddSingleton<TcpOrderListenerService>();
+            builder.Services.AddSingleton<TcpStatusListenerService>();
+
+
+            builder.Services.AddSingleton<TcpListenerService>();
+            var app = builder.Build();
+
+            // Start listening
+            var tcpService = app.Services.GetRequiredService<TcpListenerService>();
+            _ = tcpService.StartListeningAsync();
+
+
 #endif
 
             return builder.Build();

@@ -73,21 +73,23 @@ body {
 }
 
 /* CHAT BOX SIDEBAR */
-.chat-sidebar {
+/* ----- Chat Box ----- */
+#chatBox {
     position: fixed;
-    top: 130px;
-    right: -320px; /* Hidden by default */
-    width: 300px;
-    height: 270px;
-    background: #6c757d;
+    bottom: 20px;
+    right: 20px;
+    width: 250px;
+    background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: right 0.4s ease;
+    overflow: hidden;
+    transform: translateY(110%);
+    transition: transform 0.3s ease-in-out;
     z-index: 1000;
 }
 
-    .chat-sidebar.open {
-        right: 0;
+    #chatBox.open {
+        transform: translateY(0);
     }
 
 .chat-header {
@@ -95,12 +97,11 @@ body {
     color: #fff;
     padding: 10px;
     cursor: pointer;
-    text-align: center;
 }
 
 .chat-content {
     padding: 10px;
-    max-height: 300px;
+    max-height: 350px;
     overflow-y: auto;
 }
 
@@ -124,7 +125,6 @@ body {
         cursor: pointer;
     }
 
-
 /* CHAT BOX ICON*/
 .dot {
     position: absolute;
@@ -135,6 +135,7 @@ body {
     background-color: red;
     border-radius: 50%;
 }
+
 
 .badge {
     position: absolute;
@@ -147,12 +148,16 @@ body {
     padding: 2px 6px;
     font-weight: bold;
 }
-
-
-
-
+@media (max-width: 768px) {
+    #chatBox {
+        width: 100% !important;
+        right: 0 !important;
+        left: 0 !important;
+        border-radius: 0 !important;
+    }
+}
 /* CATEGORY */
-.category-scroll-container {
+    .category-scroll-container {
     display: flex;
     overflow-x: auto;
     white-space: nowrap;
@@ -265,18 +270,25 @@ body {
     padding: 20px;
     border-radius: 15px;
     max-width: 500px;
-    width: 400px;
-    height:520px;
+    width: 300px;
+    height: 400px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: column; /* Enable vertical layout */
+    justify-content: flex-start;
+}
+
+.popup-top {
+    flex-grow: 1; /* Allow content above footer to take up space */
 }
     .popup-content p{
         font-size: 15px;
     }
 
 .popup-img {
-    max-width: 40%;
+    max-width: 50%;
     height: auto;
     border-radius: 10px;
     margin-bottom: 15px;
@@ -288,7 +300,7 @@ body {
     color: black;
 }
 .popup-info {
-    font-size: 17px;
+    font-size: 14px;
     color: black;
 }
 
@@ -302,58 +314,60 @@ body {
     cursor: pointer;
     color: #999;
 }
-.quantity-controls {
+/* Footer sticks to bottom */
+.popup-footer {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin: 20px 0;
+    background-color: #fdf1d6;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    margin-top: auto; /* Push footer to bottom */
 }
 
-    .quantity-controls button {
-        width: 40px;
-        height: 40px;
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+    .quantity-container button {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        border: 1px solid #f39c12;
-        background-color: #f39c12;
-        color: white;
+        border: 2px solid black;
+        background-color: white;
+        color: black;
         font-size: 18px;
         font-weight: bold;
         cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: background-color 0.3s;
     }
 
-        .quantity-controls button:hover {
-            background-color: #e67e22;
-        }
-
-.popup-footer {
-    display: flex;
-    gap: 10px;
-    justify-content: space-between;
-    margin-top: 20px;
+.quantity-number {
+    font-weight: bold;
+    font-size: 18px;
+    min-width: 20px;
+    text-align: center;
 }
 
-    .popup-footer button {
-        flex: 1;
-        padding: 10px;
-        font-size: 16px;
-        background-color: #f39c12;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
+.add-to-cart {
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    .add-to-cart:hover {
+        background-color: #e67e22;
     }
-
-        .popup-footer button:hover {
-            background-color: #e67e22;
-        }
-
-
 
 
 /* TOAST MESSAGE*/

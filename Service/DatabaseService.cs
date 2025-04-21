@@ -26,21 +26,66 @@ namespace MenuApp.Service
             await _db.CreateTableAsync<OrderItem>();
         }
 
-        // Cart methods...
-        public Task<List<CartItem>> GetCartItemsAsync() => _db.Table<CartItem>().ToListAsync();
-        public Task<int> AddCartItemAsync(CartItem item) => _db.InsertAsync(item);
-        public Task<int> RemoveCartItemAsync(int id) => _db.DeleteAsync<CartItem>(id);
-        public Task<int> UpdateCartItemAsync(CartItem item) => _db.UpdateAsync(item);
-        public Task ClearCartAsync() => _db.DeleteAllAsync<CartItem>();
+        // Cart methods
+        public async Task<List<CartItem>> GetCartItemsAsync()
+        {
+            await Init();
+            return await _db.Table<CartItem>().ToListAsync();
+        }
 
+        public async Task<int> AddCartItemAsync(CartItem item)
+        {
+            await Init();
+            return await _db.InsertAsync(item);
+        }
 
-        // Order methods...
-        public Task<List<OrderItem>> GetOrderItemsAsync() => _db.Table<OrderItem>().ToListAsync();
-        public Task<int> AddOrderItemAsync(OrderItem item) => _db.InsertAsync(item);
-        public Task<int> UpdateOrderStatusAsync(int id, string newStatus) =>
-            _db.ExecuteAsync("UPDATE OrderItem SET Status = ? WHERE Id = ?", newStatus, id);
-        public Task<int> DeleteAllOrdersAsync() => _db.DeleteAllAsync<OrderItem>();
+        public async Task<int> RemoveCartItemAsync(int id)
+        {
+            await Init();
+            return await _db.DeleteAsync<CartItem>(id);
+        }
 
+        public async Task<int> UpdateCartItemAsync(CartItem item)
+        {
+            await Init();
+            return await _db.UpdateAsync(item);
+        }
+
+        public async Task ClearCartAsync()
+        {
+            await Init();
+            await _db.DeleteAllAsync<CartItem>();
+        }
+
+        // Orders
+        public async Task<List<OrderItem>> GetOrderItemsAsync()
+        {
+            await Init();
+            return await _db.Table<OrderItem>().ToListAsync();
+        }
+
+        public async Task<int> AddOrderItemAsync(OrderItem item)
+        {
+            await Init();
+            return await _db.InsertAsync(item);
+        }
+
+        public async Task<int> DeleteAllOrdersAsync()
+        {
+            await Init();
+            return await _db.DeleteAllAsync<OrderItem>();
+        }
+
+        public async Task UpdateOrderStatusAsync(int orderId, string newStatus)
+        {
+            await Init();
+            var order = await _db.Table<OrderItem>().Where(o => o.Id == orderId).FirstOrDefaultAsync();
+            if (order != null)
+            {
+                order.Status = newStatus;
+                await _db.UpdateAsync(order);
+            }
+        }
 
     }
 }

@@ -15,6 +15,8 @@ namespace MenuApp.Models
         public string Image { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-        public string Status { get; set; } = "Food Preparing";
+        public string Status { get; set; } // "Pending...", "Preparing...", etc.
+        public DateTime OrderedAt { get; set; } = DateTime.Now;
+        public string TableNumber { get; set; } // optional
     }
 }

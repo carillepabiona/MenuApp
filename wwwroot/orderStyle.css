@@ -1,4 +1,20 @@
-﻿.order-items {
+﻿.orders-header {
+    display: flex;
+    align-items: center;
+}
+
+.back-to-home {
+    text-decoration: none;
+    font-size: 24px;
+    color: black;
+    margin-right: 10px; /* Adds space between the icon and the text */
+}
+
+    .back-to-home i {
+        margin-right: 8px; /* Space between icon and text */
+    }
+
+.order-items {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -48,27 +64,6 @@
     color: #ff9800;
 }
 
-.status-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 8px;
-}
-
-.update-status-btn {
-    background-color: #1976d2;
-    color: white;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
-
-    .update-status-btn:hover {
-        background-color: #1565c0;
-    }
-
 .order-summary-footer {
     margin-top: 30px;
     padding: 20px;
@@ -87,19 +82,19 @@
     color: #333;
 }
 
-.bill-out-button {
-    background-color: #f57c00;
+.bill-out-btn {
+    background-color: #2196f3;
     color: white;
-    padding: 10px 18px;
     border: none;
+    padding: 12px 20px;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
 }
 
-    .bill-out-button:hover {
-        background-color: #ef6c00;
+    .bill-out-btn:hover {
+        background-color: #0d47a1;
     }
 
 .notification {
@@ -143,3 +138,71 @@
     }
 }
 
+.order-status {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    animation: fadeIn 0.6s ease-in-out;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-preparing {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-default {
+    background-color: #e2e3e5;
+    color: #6c757d;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.toast-alert {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #323232;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.3);
+    animation: fadeIn 0.5s ease-in-out;
+    z-index: 9999;
+}
+
+.badge.preparing {
+    background-color: orange;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+.badge.delivered {
+    background-color: green;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+.status-btn {
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}

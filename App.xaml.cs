@@ -9,7 +9,7 @@
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new MainPage()) { Title = "MenuApp" };
+            return new Window(new MainPage()) { Title = "28 Treasure HK Roast + Dimsum" };
         }
     }
 }

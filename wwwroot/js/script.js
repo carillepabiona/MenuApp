@@ -30,32 +30,43 @@ window.showToast = (message) => {
     }, 3000);
 };
 
-// Chat Toggle function
-function toggleChat() {
-    const chatSidebar = document.getElementById("chatSidebar");
-    chatSidebar.classList.toggle("open");
 
-    if (chatSidebar.classList.contains("open")) {
-        // Add event listener for outside click
-        document.addEventListener("click", closeChatOnOutsideClick);
+// ----- Chat Box Logic -----
+function toggleChat(event) {
+    const chatBox = document.getElementById("chatBox");
+
+
+    chatBox.classList.toggle("open");
+
+    // Listen for clicks outside to close
+    if (chatBox.classList.contains("open")) {
+        document.getElementById("chatBadge").style.display = "none"; // Hide notification dot when opened
+        document.addEventListener("click", closeOnClickOutside);
     } else {
-        document.removeEventListener("click", closeChatOnOutsideClick);
+        document.removeEventListener("click", closeOnClickOutside);
     }
+
+
+    event.stopPropagation(); // Prevent click from propagating
 }
 
-function closeChatOnOutsideClick(event) {
-    const chatSidebar = document.getElementById("chatSidebar");
+// ----- Close Cart or Chat when Clicking Outside -----
+function closeOnClickOutside(event) {
+    const chatBox = document.getElementById("chatBox");
     const chatToggle = document.querySelector(".chat-toggle");
 
-    if (!chatSidebar.contains(event.target) && !chatToggle.contains(event.target)) {
-        chatSidebar.classList.remove("open");
-        document.removeEventListener("click", closeChatOnOutsideClick);
+    // Check if the click is outside both containers and buttons
+    if (
+        !chatBox.contains(event.target) &&
+        !chatToggle.contains(event.target)
+    ) {
+        chatBox.classList.remove("open");
+
+        // Remove event listener to prevent unnecessary checks
+        document.removeEventListener("click", closeOnClickOutside);
     }
+
 }
-
-
-
-
 
 
 

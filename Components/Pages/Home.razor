@@ -50,26 +50,30 @@
     </div>
 </SectionContent>
 
-<!-- Chat Sidebar -->
-<div id="chatSidebar" class="chat-sidebar" style="background-color: #FFECB3; border: 3px solid #FF6F00; width: 300px; height: 380px">
-    <div class="chat-header" onclick="toggleChat()" style="background-color: #FF6F00; color: white; padding: 10px; font-size: 18px; border-radius:4px;">
-        Chat Box
-    </div>
-    <div class="chat-content" id="chatContent" style="height: 250px; width: 100%; overflow-y: auto; padding: 10px; background-color: #FFF3E0;">
-        @foreach (var msg in Messages)
-        {
-            <div style="color: #5D4037; padding: 5px 0;">@msg</div>
-        }
-    </div>
-    <div class="chat-input" style="padding: 5px; background-color: #FFECB3; margin: 5px;">
-        <input @bind="OutgoingMessage" type="text" placeholder="Type a message..."
-               style="width: 200px; padding: 10px; font-size: 16px; border: 1px solid #FF6F00; border-radius: 5px; margin: 5px;" />
-        <button @onclick="SendMessageToSender"
-                style="background-color: #FF6F00; color: white; font-size: 16px; border: none; border-radius: 5px; margin-top: 5px; padding: 10px;">
-            Send
-        </button>
+
+<div id="chatContainer" style="position: fixed; bottom: 0; right: 10px; z-index: 999;">
+      <!-- Chat Box -->
+    <div id="chatBox" class="sidebar" style="background-color: #FFECB3; border: 3px solid #FF6F00; width: 300px;">
+        <div class="chat-header" onclick="toggleChat()" style="background-color: #FF6F00; color: white; padding: 10px; font-size: 18px;">
+            Chat Box
+        </div>
+        <div class="chat-content" id="chatContent" style="height: 300px; width: 295px; overflow-y: auto; padding: 10px; background-color: #FFF3E0;">
+                @foreach (var msg in Messages)
+                {
+                        <div style="color: #5D4037; padding: 5px 0;">@msg</div>
+                }
+        </div>
+        <div class="chat-input" style="padding: 5px; background-color: #FFECB3; margin: 5px;">
+            <input @bind="OutgoingMessage" type="text" placeholder="Type a message..."
+            style="width: 200px; padding: 10px; font-size: 16px; border: 1px solid #FF6F00; border-radius: 5px; margin: 5px;" />
+            <button @onclick="SendMessageToSender"
+            style="background-color: #FF6F00; color: white; padding: px; font-size: 16px; border: none; border-radius: 5px; margin-top: 5px;">
+                Send
+            </button>
+        </div>
     </div>
 </div>
+
 
 
 <!-- Category -->
@@ -102,35 +106,36 @@
         </div>
     }
 </div>
-@if (SelectedFoodItem != null)
-{
-    <div class="food-detail-overlay" @onclick="HandleOverlayClick">
-        <div class="popup-content" @onclick:stopPropagation>
-            <!-- Close Button -->
-            <button class="close-button" @onclick="CloseDetail">×</button>
+    @if (SelectedFoodItem != null)
+    {
+        <div class="food-detail-overlay" @onclick="HandleOverlayClick">
+            <div class="popup-content" @onclick:stopPropagation>
+                <!-- Close Button -->
+                <button class="close-button" @onclick="CloseDetail">×</button>
 
-            <!-- Top Section -->
-            <div class="popup-top">
-                <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
-                <div class="popup-info">
-                    <p style="font-size:25px; font-weight:bold;">@SelectedFoodItem.Name</p>
-                    <p>@SelectedFoodItem.Description</p>
-                    <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
-                    <div class="quantity-controls">
-                        <button @onclick="DecreaseQuantity">-</button>
-                        <span>@SelectedQuantity</span>
-                        <button @onclick="IncreaseQuantity">+</button>
+                <!-- Top Section -->
+                <div class="popup-top">
+                    <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
+                    <div class="popup-info">
+                        <p style="font-size:18px; font-weight:bold;">@SelectedFoodItem.Name</p>
+                        <p>@SelectedFoodItem.Description</p>
+                        <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
+
                     </div>
                 </div>
-            </div>
-            <!-- Footer Section -->
-            <div class="popup-footer">
-                <button @onclick="AddToCart">Add to Cart</button>
-                <button @onclick="OrderNow">Order Now</button>
+                <!-- Footer Section -->
+                <div class="popup-footer">
+                    <div class="quantity-container">
+                        <button @onclick="DecreaseQuantity">−</button>
+                        <span class="quantity-number">@SelectedQuantity</span>
+                        <button @onclick="IncreaseQuantity">+</button>
+                    </div>
+                    <button class="add-to-cart" @onclick="AddToCart">Add To Cart</button>
+                </div>
             </div>
         </div>
-    </div>
-}
+    }
+
 
 
 @code {
@@ -222,7 +227,7 @@
     [Inject] private NavigationManager Nav { get; set; }
     [Inject] private DatabaseService DB { get; set; }
 
-    
+
     private void DecreaseQuantity() => SelectedQuantity = Math.Max(1, SelectedQuantity - 1);
     private void IncreaseQuantity() => SelectedQuantity++;
 
@@ -230,7 +235,7 @@
     {
         CloseDetail();
     }
-    
+
     private async Task AddToCart()
     {
         var item = new CartItem
@@ -274,8 +279,8 @@
     {
         CartService.OnChange -= StateHasChanged;
     }
-   
-    /////////////////////  CHAT BOX /////////////////////  /////////////////////  /////////////////////  /////////////////////
+
+    ///////////////////// CHAT BOX/////////////////////  /////////////////////  /////////////////////  /////////////////////
 
     private TcpListener _listener;
     private const int Port = 5000;
@@ -287,8 +292,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        FilteredFoodItems = FoodItems;
         await StartListening();
-        SelectCategory("All");
     }
 
     private async Task StartListening()

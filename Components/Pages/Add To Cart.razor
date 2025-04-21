@@ -1,17 +1,23 @@
 ﻿@page "/addtocart"
 @inject DatabaseService DB
 @inject NavigationManager Navigation
-@using MenuApp.Service;
+@using MenuApp.Service
 @using SQLite
 @using MenuApp.Models
 @using System.Linq
+@using System.Net.Sockets
+@using System.Text
 
 <PageTitle>Cart</PageTitle>
 <head>
     <link rel="stylesheet" href="cartStyle.css">
 </head>
-<h3>Your Cart</h3>
-
+<div class="cart-header">
+    <a href="/home" class="back-to-home">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h3>Your Cart</h3>
+</div>
 @if (cartItems == null || !cartItems.Any())
 {
     <p>Your cart is empty.</p>
@@ -84,7 +90,9 @@ else
 
     private async Task PlaceOrder()
     {
-        // Move cart items to orders and set status to "Preparing"
+        string tableNumber = "A2"; // You can make this dynamic later
+        var orderItems = new List<OrderItem>();
+
         foreach (var item in cartItems)
         {
             var orderItem = new OrderItem
@@ -92,17 +100,42 @@ else
                     Name = item.Name,
                     Price = item.Price,
                     Quantity = item.Quantity,
-                    Status = "Preparing",
-                    Image = item.Image
+                    Status = "Pending...",
+                    Image = item.Image,
+                    OrderedAt = DateTime.Now,
+                    TableNumber = tableNumber
                 };
 
             await DB.AddOrderItemAsync(orderItem);
+            orderItems.Add(orderItem);
         }
 
-        // Clear the cart after placing the order
-        await DB.ClearCartAsync();
+        // Serialize and send order to POS
+        await SendOrderToPOSAsync(orderItems);
 
-        // Redirect to the orders page
+        // Clear local cart
+        await DB.ClearCartAsync();
         Navigation.NavigateTo("/myorder");
     }
+    private async Task SendOrderToPOSAsync(List<OrderItem> orderItems)
+    {
+        try
+        {
+            string posIp = "192.168.254.106"; // Replace with the POS tablet's local IP
+            int posPort = 9000;
+
+            using TcpClient client = new TcpClient();
+            await client.ConnectAsync(posIp, posPort);
+
+            using NetworkStream stream = client.GetStream();
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(orderItems);
+            byte[] buffer = Encoding.UTF8.GetBytes(jsonData);
+            await stream.WriteAsync(buffer, 0, buffer.Length);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send order to POS: {ex.Message}");
+        }
+    }
+
 }
