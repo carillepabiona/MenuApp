@@ -42,7 +42,7 @@
                     <span class="cart-badge">@CartService.GetCartCount()</span>
                 }
             </div>
-             <button class="chat-toggle" onclick="toggleChat(event)" style="background: none; border: none;">
+            <button class="chat-toggle" onclick="toggleChat(event)" style="background: none; border: none;">
                 <i class="fa-regular fa-comment-dots" style="font-size: 24px; color: black;"></i>
                 <span id="chatBadge" class="dot" style="display: none;"></span>
             </button>
@@ -52,16 +52,16 @@
 
 
 <div id="chatContainer" style="position: fixed; bottom: 0; right: 10px; z-index: 999;">
-      <!-- Chat Box -->
+    <!-- Chat Box -->
     <div id="chatBox" class="sidebar" style="background-color: #FFECB3; border: 3px solid #FF6F00; width: 300px;">
         <div class="chat-header" onclick="toggleChat()" style="background-color: #FF6F00; color: white; padding: 10px; font-size: 18px;">
             Chat Box
         </div>
         <div class="chat-content" id="chatContent" style="height: 300px; width: 295px; overflow-y: auto; padding: 10px; background-color: #FFF3E0;">
-                @foreach (var msg in Messages)
-                {
-                        <div style="color: #5D4037; padding: 5px 0;">@msg</div>
-                }
+            @foreach (var msg in Messages)
+            {
+                <div style="color: #5D4037; padding: 5px 0;">@msg</div>
+            }
         </div>
         <div class="chat-input" style="padding: 5px; background-color: #FFECB3; margin: 5px;">
             <input @bind="OutgoingMessage" type="text" placeholder="Type a message..."
@@ -79,14 +79,14 @@
 <!-- Category -->
 <div class="category-scroll-container">
     <button class="category-button @(SelectedCategory == "All" ? "selected" : "")"
-            @onclick='() => SelectCategory("All")'>
+    @onclick='() => SelectCategory("All")'>
         All
     </button>
 
     @foreach (var category in FoodCategories)
     {
         <button class="category-button @(SelectedCategory == category.Name ? "selected" : "")"
-                @onclick='() => SelectCategory(category.Name)'>
+        @onclick='() => SelectCategory(category.Name)'>
             @category.DisplayName
         </button>
     }
@@ -106,35 +106,37 @@
         </div>
     }
 </div>
-    @if (SelectedFoodItem != null)
-    {
-        <div class="food-detail-overlay" @onclick="HandleOverlayClick">
-            <div class="popup-content" @onclick:stopPropagation>
-                <!-- Close Button -->
-                <button class="close-button" @onclick="CloseDetail">×</button>
+@if (SelectedFoodItem != null)
+{
+    <div class="food-detail-overlay" @onclick="HandleOverlayClick">
+        <div class="popup-content" @onclick:stopPropagation>
+            <!-- Close Button -->
+            <button class="close-button" @onclick="CloseDetail">×</button>
 
-                <!-- Top Section -->
-                <div class="popup-top">
-                    <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
-                    <div class="popup-info">
-                        <p style="font-size:18px; font-weight:bold;">@SelectedFoodItem.Name</p>
-                        <p>@SelectedFoodItem.Description</p>
-                        <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
+            <!-- Top Section -->
+            <div class="popup-top">
+                <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
+                <div class="popup-info">
+                    <p style="font-size:18px; font-weight:bold;">@SelectedFoodItem.Name</p>
+                    <p>@SelectedFoodItem.Description</p>
+                    <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
 
-                    </div>
-                </div>
-                <!-- Footer Section -->
-                <div class="popup-footer">
-                    <div class="quantity-container">
-                        <button @onclick="DecreaseQuantity">−</button>
-                        <span class="quantity-number">@SelectedQuantity</span>
-                        <button @onclick="IncreaseQuantity">+</button>
-                    </div>
-                    <button class="add-to-cart" @onclick="AddToCart">Add To Cart</button>
                 </div>
             </div>
+            <!-- Footer Section -->
+            <div class="popup-footer">
+                <div class="quantity-container">
+                    <button @onclick="DecreaseQuantity">−</button>
+                    <span class="quantity-number">@SelectedQuantity</span>
+                    <button @onclick="IncreaseQuantity">+</button>
+                </div>
+                <button class="add-to-cart" @onclick="AddToCart">Add To Cart</button>
+            </div>
         </div>
-    }
+    </div>
+}
+
+
 
 
 
@@ -274,6 +276,15 @@
     protected override void OnInitialized()
     {
         CartService.OnChange += StateHasChanged;
+
+
+        //create ko un shared file
+        var messageFilePath = FileSystem.AppDataDirectory + "/messages.txt";
+        if (!File.Exists(messageFilePath))
+        {
+            //File.WriteAllText(messageFilePath, "[ { \"user\":\"table1\", \"message\":\"chat 1\" }, { \"user\":\"table2\", \"message\":\"Hello world\" }, { \"user\":\"table2\", \"message\":\"Hi\" } ]");
+            File.WriteAllText(messageFilePath, "");
+        }
     }
     public void Dispose()
     {
@@ -287,8 +298,8 @@
     private List<string> Messages = new();
     private string OutgoingMessage = "";
 
-    private const string SenderIP = "192.168.254.106"; // Update to actual sender IP
-    private const int SenderPort = 5000;
+    private const string ServerIP = "192.168.53.207";//"10.2.207.45";//"192.168.254.106"; // Update to actual sender IP
+    private const int ServerPort = 5000;
 
     protected override async Task OnInitializedAsync()
     {
@@ -300,7 +311,7 @@
     {
         try
         {
-            _listener = new TcpListener(IPAddress.Any, Port);
+            _listener = new TcpListener(IPAddress.Parse(ServerIP), ServerPort);
             _listener.Start();
 
             while (true)
@@ -325,6 +336,16 @@
             string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
             Messages.Add($"Sender: {message}");
+            var messageFilePath = FileSystem.AppDataDirectory + "/messages.txt";
+            if (!File.Exists(messageFilePath))
+            {
+                File.WriteAllText(messageFilePath, "");
+            }
+
+            using (var sw = new StreamWriter(messageFilePath))
+            {
+                sw.WriteLine(message);
+            }
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
@@ -340,7 +361,7 @@
             try
             {
                 using var client = new TcpClient();
-                await client.ConnectAsync(SenderIP, SenderPort);
+                await client.ConnectAsync(ServerIP, ServerPort);
 
                 using var stream = client.GetStream();
                 byte[] data = Encoding.UTF8.GetBytes(OutgoingMessage);

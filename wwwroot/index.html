@@ -92,7 +92,39 @@
     <script src="lib/jquery/dist/jquery.min.js"></script>
     <script src="lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="_framework/blazor.webview.js" autostart="false"></script>
+    <script>
+        //Page Load
+        $(function () {
+            checkMessages();
+        });
 
+        function checkMessages() {
+            $('#chatContent').html('');
+
+            $.ajax({
+                //url: '/messages.json',
+                url: '/messages.txt',
+                method: 'GET',
+                success: function (res) {
+                    console.log('checkMessages Success: ', res);
+                    ////let translatedMessages = JSON.parse(res);
+                    //let messages = '';
+                    //for (let msg of res) {
+                    //    messages += '<li>User:' + msg.user + ' <br> ' + msg.message + '</li>';
+                    //}
+                    //$('#chatContent').html('<ul class="messages-format">' + messages + '</ul>');
+                    if ($('#chatContent').html() != res) {
+                        $('#chatContent').html(res);
+                    }                    
+                    setTimeout('checkMessages()', 1000);
+                },
+                error: function (err) {
+                    console.log('checkMessages Error: ', err);
+                    setTimeout('checkMessages()', 1000);
+                },
+            });
+        }
+    </script>
 </body>
 
 </html>
