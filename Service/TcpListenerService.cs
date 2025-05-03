@@ -10,8 +10,8 @@ namespace MenuApp.Service
 {
     public class TcpListenerService
     {
+        
+    }
 
-        }
-
-        }
+}
 

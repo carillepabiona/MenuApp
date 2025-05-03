@@ -117,11 +117,12 @@ else
         await DB.ClearCartAsync();
         Navigation.NavigateTo("/myorder");
     }
+
     private async Task SendOrderToPOSAsync(List<OrderItem> orderItems)
     {
         try
         {
-            string posIp = "192.168.254.106"; // Replace with the POS tablet's local IP
+            string posIp = "192.168.105.251"; // Replace with the POS tablet's local IP
             int posPort = 9000;
 
             using TcpClient client = new TcpClient();
