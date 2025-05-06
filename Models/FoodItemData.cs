@@ -30,7 +30,7 @@ namespace MenuApp.Models
             new FoodItem { Name = "Pork Meatballs", Category = "Noodles Mami", Price = 228, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Juicy pork meatballs in a warm, savory noodle soup." },
             new FoodItem { Name = "Asado", Category = "Noodles Mami", Price = 268, Image = "28_Treasures_Menu/AsadoPork.png", Description = "Tender asado served with noodles in a flavorful broth." },
             new FoodItem { Name = "Shredded Chicken", Category = "Noodles Mami", Price = 228, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Shredded chicken in a savory noodle broth, perfect for a light meal." },
-            new FoodItem { Name = "Roast Duck", Category = "Noodles Mami", Price = 388, Image = "28_Treasures_Menu/Chopsuey.png.jpg", Description = "Savory roast duck served with noodles in a rich broth." },
+            new FoodItem { Name = "Roast Duck", Category = "Noodles Mami", Price = 388, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Savory roast duck served with noodles in a rich broth." },
             new FoodItem { Name = "Seasonal Vegetables with Oyster Sauce", Category = "Noodles Mami", Price = 258, Image = "28_Treasures_Menu/Chopsuey.png", Description = "A healthy combination of seasonal vegetables cooked in oyster sauce, served with noodles." },
 
            // CONGEE
@@ -39,7 +39,7 @@ namespace MenuApp.Models
             new FoodItem { Name = "Sliced Chicken with Mushroom", Category = "Congee", Price = 238, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Sliced chicken and savory mushrooms in a hearty congee." },
             new FoodItem { Name = "Pork Meatball (Bola-Bola)", Category = "Congee", Price = 238, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Succulent pork meatballs in a comforting congee." },
             new FoodItem { Name = "Sliced Pork with Century Egg", Category = "Congee", Price = 248, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Sliced pork and century egg in a flavorful congee." },
-            new FoodItem { Name = "Asado and Salted Egg", Category = "Congee", Price = 288, Image = "28_Treasures_Menu/dChopsuey.png", Description = "Savory asado and salted egg served in a rich congee." },
+            new FoodItem { Name = "Asado and Salted Egg", Category = "Congee", Price = 288, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Savory asado and salted egg served in a rich congee." },
 
             // SWEET DESSERT
             new FoodItem { Name = "Butchi (4 pcs)", Category = "Sweet Dessert", Price = 118, Image = "28_Treasures_Menu/Chopsuey.png", Description = "Deep-fried glutinous rice balls filled with sweet mung bean paste." },

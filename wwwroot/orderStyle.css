@@ -82,6 +82,19 @@
     color: #333;
 }
 
+.order-note {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+}
+
+    .order-note p {
+        margin: 5px 0;
+        font-style: italic;
+        color: #555;
+    }
+
 .bill-out-btn {
     background-color: #2196f3;
     color: white;
@@ -172,6 +185,7 @@
         transform: translateY(0);
     }
 }
+
 .toast-alert {
     position: fixed;
     bottom: 20px;

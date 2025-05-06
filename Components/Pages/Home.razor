@@ -1,5 +1,4 @@
 ﻿@page "/home"
-
 @using MenuApp.Models
 @inject CartService CartService
 @inject NavigationManager Navigation
@@ -20,21 +19,15 @@
 
 
 <SectionContent SectionName="page-buttons">
-    <div class="search-cart-wrapper d-flex justify-between align-items-center">
-        <div id="searchBox" class="input-group header-search" style="display:none; width:500px;">
-            <span class="input-group-text text-warning"><i class="fa fa-search"></i></span>
-            <input id="txtSearch" type="text" class="form-control" placeholder="Search" value="@searchText" @oninput="SearchTerm" />
-            <span class="input-group-text" @onclick="HideSearchBox"><i class="fa fa-times"></i></span>
+    <div class="flex-row-wrapper">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" @bind="SearchQuery" placeholder="Search for food..." id="search-input" />
+            <button class="clear-btn" @onclick="ClearSearch" style="visibility: @(string.IsNullOrEmpty(SearchQuery) ? "hidden" : "visible") ; color: black; background: white; ">×</button>
+            <button @onclick="SearchItems">Search</button>
         </div>
 
-        <div class="search-cart-left">
-            <span id="controlBox">
-                <button class="btn text-warning" @onclick="ShowSearchBox">
-                    <i class="fa fa-search"></i>
-                </button>
-            </span>
-        </div>
-        <div id="toast" class="toast">Item added to cart!</div>
+        <!-- Cart and Chat Icons -->
         <div class="search-cart-right d-flex align-items-center gap-3">
             <div style="position: relative; cursor: pointer;" @onclick="@GoToCart">
                 <i class="fa fa-shopping-cart cart-icon" style="font-size: 30px;"></i>
@@ -43,26 +36,29 @@
                     <span class="cart-badge">@CartService.GetCartCount()</span>
                 }
             </div>
-             <button class="chat-toggle" onclick="toggleChat(event)" style="background: none; border: none;">
+            <button class="chat-toggle" onclick="toggleChat(event)" style="background: none; border: none;">
                 <i class="fa-regular fa-comment-dots" style="font-size: 24px; color: black;"></i>
                 <span id="chatBadge" class="dot" style="display: none;"></span>
             </button>
         </div>
     </div>
+
+    <div id="toast" class="toast">Item added to cart!</div>
 </SectionContent>
 
 
+
 <div id="chatContainer" style="position: fixed; bottom: 0; right: 10px; z-index: 999;">
-      <!-- Chat Box -->
+    <!-- Chat Box -->
     <div id="chatBox" class="sidebar" style="background-color: #FFECB3; border: 3px solid #FF6F00; width: 300px;">
         <div class="chat-header" onclick="toggleChat()" style="background-color: #FF6F00; color: white; padding: 10px; font-size: 18px;">
             Chat Box
         </div>
         <div class="chat-content" id="chatContent" style="height: 300px; width: 295px; overflow-y: auto; padding: 10px; background-color: #FFF3E0;">
-                @foreach (var msg in Messages)
-                {
-                        <div style="color: #5D4037; padding: 5px 0;">@msg</div>
-                }
+            @foreach (var msg in Messages)
+            {
+                <div style="color: #5D4037; padding: 5px 0;">@msg</div>
+            }
         </div>
         <div class="chat-input" style="padding: 5px; background-color: #FFECB3; margin: 5px;">
             <input @bind="OutgoingMessage" type="text" placeholder="Type a message..."
@@ -79,17 +75,18 @@
 
 <!-- Category -->
 <div class="category-scroll-container">
-    <button class="category-button @(SelectedCategory == "All" ? "selected" : "")"
-            @onclick='() => SelectCategory("All")'>
-        All
-    </button>
+    <span class="category-label @(SelectedCategory == "All" ? "active-category" : "")"
+    @onclick="@(() => SelectCategory("All"))">All</span>
+
+    <span class="category-label @(SelectedCategory == "Best Selling" ? "active-category" : "")"
+          @onclick="@(() => SelectCategory("Best Selling"))">🔥 Best Selling</span>
 
     @foreach (var category in FoodCategories)
     {
-        <button class="category-button @(SelectedCategory == category.Name ? "selected" : "")"
-                @onclick='() => SelectCategory(category.Name)'>
+        <span class="category-label @(SelectedCategory == category.Name ? "active-category" : "")"
+              @onclick="@(() => SelectCategory(category.Name))">
             @category.DisplayName
-        </button>
+        </span>
     }
 </div>
 
@@ -107,81 +104,82 @@
         </div>
     }
 </div>
-    @if (SelectedFoodItem != null)
-    {
-        <div class="food-detail-overlay" @onclick="HandleOverlayClick">
-            <div class="popup-content" @onclick:stopPropagation>
-                <!-- Close Button -->
-                <button class="close-button" @onclick="CloseDetail">×</button>
+@if (SelectedFoodItem != null)
+{
+    <div class="food-detail-overlay" @onclick="HandleOverlayClick">
+        <div class="popup-content" @onclick:stopPropagation>
+            <!-- Close Button -->
+            <button class="close-button" @onclick="CloseDetail">×</button>
 
-                <!-- Top Section -->
-                <div class="popup-top">
-                    <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
-                    <div class="popup-info">
-                        <p style="font-size:18px; font-weight:bold;">@SelectedFoodItem.Name</p>
-                        <p>@SelectedFoodItem.Description</p>
-                        <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
+            <!-- Top Section -->
+            <div class="popup-top">
+                <img src="@SelectedFoodItem.Image" class="popup-img" alt="@SelectedFoodItem.Name" />
+                <div class="popup-info">
+                    <p style="font-size:18px; font-weight:bold;">@SelectedFoodItem.Name</p>
+                    <p>@SelectedFoodItem.Description</p>
+                    <p class="popup-price">₱ @SelectedFoodItem.Price.ToString("F2")</p>
 
-                    </div>
-                </div>
-                <!-- Footer Section -->
-                <div class="popup-footer">
-                    <div class="quantity-container">
-                        <button @onclick="DecreaseQuantity">−</button>
-                        <span class="quantity-number">@SelectedQuantity</span>
-                        <button @onclick="IncreaseQuantity">+</button>
-                    </div>
-                    <button class="add-to-cart" @onclick="AddToCart">Add To Cart</button>
                 </div>
             </div>
+            <!-- Footer Section -->
+            <div class="popup-footer">
+                        <div class="quantity-container">
+                            <button @onclick="DecreaseQuantity">−</button>
+                            <input type="number" min="1" @bind="Quantity" class="quantity-input" />
+                            <button @onclick="IncreaseQuantity">+</button>
+                        </div>
+                <button class="add-to-cart" @onclick="AddToCart">Add To Cart</button>
+            </div>
         </div>
-    }
+    </div>
+}
 
 
 
 @code {
     private string SelectedCategory = "All";
     List<BestSellingItem> TopItems = new();
-    private void SelectCategory(string category)
+    private async void SelectCategory(string category)
     {
         SelectedCategory = category;
+
         if (category == "All")
         {
             ShowAllItems();
+        }
+        else if (category == "Best Selling")
+        {
+          
         }
         else
         {
             FilterCategory(category);
         }
+
+        StateHasChanged();
     }
     ///////////////////// SEARCH /////////////////////
-    private string searchText;
+    private string SearchQuery = string.Empty; // Store the search query
 
-    private void SearchTerm(ChangeEventArgs e)
+    // Method to filter items based on search query
+    void SearchItems()
     {
-        searchText = e.Value?.ToString();
-        SearchFood(); // 👈 Add this line to trigger filtering
-    }
-
-
-    private void ClearSearch()
-    {
-        searchText = string.Empty;
-        SearchFood(); // 👈 Add this line to reset the food list when clearing search
-    }
-
-    private void SearchFood()
-    {
-        if (string.IsNullOrWhiteSpace(searchText))
+        if (string.IsNullOrWhiteSpace(SearchQuery))
         {
+            // If search is empty, show all items
             FilteredFoodItems = FoodItems;
         }
         else
         {
-            FilteredFoodItems = FoodItems
-                .Where(item => item.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+            // Filter items based on the search query
+            FilteredFoodItems = FoodItems.Where(f => f.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
         }
+    }
+
+    private void ClearSearch()
+    {
+        SearchQuery = string.Empty;  // Clear the search input
+        FilteredFoodItems = FoodItems;  // Reset the filtered items to show all
     }
 
     ///////////////////// CATEGORY /////////////////////  /////////////////////  /////////////////////  /////////////////////
@@ -201,24 +199,33 @@
     {
         FilteredFoodItems = FoodItems;
     }
-    private FoodItem? SelectedFoodItem;
 
+    private int SelectedQuantity = 1;
+    private void DecreaseQuantity() => Quantity = Math.Max(1, Quantity - 1);
+    private void IncreaseQuantity() => Quantity++;
+    
     private void ShowDetail(FoodItem item)
     {
         SelectedFoodItem = item;
+        Quantity = 1;
     }
+
+    private int Quantity
+    {
+        get => _quantity;
+        set => _quantity = value < 1 ? 1 : value;
+    }
+    private int _quantity = 1;
 
     private void CloseDetail()
     {
         SelectedFoodItem = null;
     }
+  
+    private FoodItem? SelectedFoodItem;
 
     [Inject] private NavigationManager Nav { get; set; }
     [Inject] private DatabaseService DB { get; set; }
-
-
-    private void DecreaseQuantity() => SelectedQuantity = Math.Max(1, SelectedQuantity - 1);
-    private void IncreaseQuantity() => SelectedQuantity++;
 
     private void HandleOverlayClick()
     {
@@ -232,7 +239,7 @@
                 Name = SelectedFoodItem.Name,
                 Image = SelectedFoodItem.Image,
                 Price = SelectedFoodItem.Price,
-                Quantity = SelectedQuantity
+                Quantity = Quantity
             };
 
         await DB.AddCartItemAsync(item);
@@ -248,7 +255,7 @@
                 Name = SelectedFoodItem.Name,
                 Image = SelectedFoodItem.Image,
                 Price = SelectedFoodItem.Price,
-                Quantity = SelectedQuantity,
+                Quantity = Quantity,
                 Status = "Food Preparing"
             };
 
@@ -276,7 +283,7 @@
     private List<string> Messages = new();
     private string OutgoingMessage = "";
 
-    private const string SenderIP = "192.168.254.159"; // Update to actual sender IP
+    private const string SenderIP = "192.168.254.106"; // Update to actual sender IP
     private const int SenderPort = 5000;
 
     protected override async Task OnInitializedAsync()
@@ -313,7 +320,7 @@
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
 
-            Messages.Add($"Sender: {message}");
+            Messages.Add($"Staff: {message}");
             await InvokeAsync(StateHasChanged);
         }
         catch (Exception ex)
@@ -345,4 +352,5 @@
             }
         }
     }
+
 }

@@ -17,6 +17,28 @@ namespace MenuApp.Models
         /// </summary>
         public List<CartItem> CartItems { get; private set; } = new();
 
+        public void AddItem(CartItem item)
+        {
+            var existing = CartItems.FirstOrDefault(ci => ci.Name == item.Name); // Fixed here
+            if (existing != null)
+            {
+                existing.Quantity += item.Quantity;
+            }
+            else
+            {
+                CartItems.Add(item); // Fixed here
+            }
+
+            NotifyStateChanged();
+        }
+
+        public int GetCartCount()
+        {
+            return CartItems.Sum(ci => ci.Quantity); // Fixed here
+        }
+
+        private void NotifyStateChanged() => OnChange?.Invoke();
+
         /// <summary>
         /// Adds a food item to the cart or increases quantity if already present.
         /// </summary>
@@ -76,10 +98,7 @@ namespace MenuApp.Models
             NotifyStateChanged();
         }
 
-        /// <summary>
-        /// Gets the total count of items in the cart (summing quantities).
-        /// </summary>
-        public int GetCartCount() => CartItems.Sum(ci => ci.Quantity);
+
 
         /// <summary>
         /// Clears the cart entirely.
@@ -93,6 +112,6 @@ namespace MenuApp.Models
         /// <summary>
         /// Triggers a UI refresh by notifying subscribers.
         /// </summary>
-        private void NotifyStateChanged() => OnChange?.Invoke();
+
     }
 }

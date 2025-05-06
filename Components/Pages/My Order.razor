@@ -18,39 +18,48 @@
 </div>
 @if (orderItems == null || !orderItems.Any())
 {
-            <p>You don't have any orders yet.</p>
+    <p>You don't have any orders yet.</p>
 }
 else
 {
-            <div class="order-items">
+    <div class="order-items">
         @foreach (var order in orderItems)
         {
-                            <div class="order-item">
-                                <img src="@order.Image" alt="@order.Name" class="order-item-img" />
-                                <div class="order-item-details">
-                                    <h5>@order.Name</h5>
-                                    <p>₱ @order.Price.ToString("F2")</p>
-                                    <p>Quantity: @order.Quantity</p>
-                                    <p>Status: <span class="order-status">@order.Status</span></p>
-                                </div>
-                            </div>
-        }
-        @if (orderItems != null && orderItems.Any())
-        {
-                            <div class="order-summary-footer">
-                                <div class="order-total">
-                                    <strong>Total:</strong> ₱ @orderItems.Sum(item => item.Price * item.Quantity).ToString("F2")
-                                </div>
-                                <button class="bill-out-btn" @onclick="BillOut">Bill Out</button>
-                            </div>
-        }
-        @if (!string.IsNullOrEmpty(notificationMessage))
-        {
-                            <div class="notification">
-                                <p>@notificationMessage</p>
-                            </div>
-        }
+            <div class="order-item">
+                <img src="@order.Image" alt="@order.Name" class="order-item-img" />
+                <div class="order-item-details">
+                    <h5>@order.Name</h5>
+                    <p>₱ @order.Price.ToString("F2")</p>
+                    <p>Quantity: @order.Quantity</p>
+                    <p>Status: <span class="order-status">@order.Status</span></p>
+                </div>
             </div>
+        }
+
+        @if (orderItems.Any(order => !string.IsNullOrEmpty(order.Note)))
+        {
+            <div class="order-note">
+                <strong>Note to Staff:</strong>
+                @foreach (var order in orderItems.Where(o => !string.IsNullOrEmpty(o.Note)))
+                {
+                    <p>@order.Note</p>
+                }
+            </div>
+        }
+
+        <div class="order-summary-footer">
+            <div class="order-total">
+                <strong>Total:</strong> ₱ @orderItems.Sum(item => item.Price * item.Quantity).ToString("F2")
+            </div>
+            <button class="bill-out-btn" @onclick="BillOut">Bill Out</button>
+        </div>
+    </div>
+}
+@if (!string.IsNullOrEmpty(notificationMessage))
+{
+    <div class="notification">
+        <p>@notificationMessage</p>
+    </div>
 }
 
 @code {
@@ -81,4 +90,4 @@ else
         // Redirect to the /start page after clearing the orders
         NavigationManager.NavigateTo("/");
     }
-} 
+}   

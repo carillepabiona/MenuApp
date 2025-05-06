@@ -37,39 +37,93 @@ body {
     cursor: pointer;
 }
 
-.search-cart-wrapper {
+
+.flex-row-wrapper {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    padding: 0 10px;
-}
-
-.search-cart-left {
-    display: flex;
-    align-items: center;
     gap: 10px;
+    padding: 0 10px;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
-.search-cart-right {
+/* Search Bar Container */
+.search-container {
     display: flex;
     align-items: center;
+    margin: 10px 0;
+    padding: 0 10px;
+    position: relative; /* To position the clear button inside the input */
 }
+
+    .search-container input {
+        width: 300px;
+        padding: 6px 10px;
+        font-size: 15px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+        background-color: white; /* Ensure input background is white */
+    }
+
+/* Clear Button (X) */
+.clear-btn {
+    position: absolute;
+    left: 260px; /* Position it inside the input field */
+    top: 50%;
+    transform: translateY(-50%);
+    background: white; /* Background of the button is white */
+    border: none;
+    font-size: 8px; /* Increased size for visibility */
+    color: black; /* X color is black */
+    cursor: pointer;
+    visibility: hidden; /* Default is hidden */
+}
+
+/* Focus effect on input */
+.search-container input:focus {
+    border-color: #4CAF50;
+}
+
+
+
+/* Search Button */
+.search-container button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 15px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .search-container button:hover {
+        background-color: #45a049;
+    }
 
 .cart-icon {
     position: relative;
     display: inline-block;
-    font-size: 24px;
+    font-size: 15px;
 }
 
 .cart-badge {
     position: absolute;
-    top: -8px;
-    right: -10px;
-    background-color: red;
+    top: -5px;
+    right: -5px;
+    background-color: #e74c3c;
     color: white;
-    font-size: 12px;
-    padding: 2px 6px;
     border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 6px;
+    line-height: 1;
+    z-index: 1;
 }
 
 /* CHAT BOX SIDEBAR */
@@ -148,6 +202,7 @@ body {
     padding: 2px 6px;
     font-weight: bold;
 }
+
 @media (max-width: 768px) {
     #chatBox {
         width: 100% !important;
@@ -156,40 +211,35 @@ body {
         border-radius: 0 !important;
     }
 }
+
 /* CATEGORY */
-    .category-scroll-container {
+.category-scroll-container {
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    gap: 10px;
-    padding: 10px;
-    scroll-behavior: smooth;
-}
-
-    .category-scroll-container::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .category-scroll-container::-webkit-scrollbar-thumb {
-        background-color: #888;
-        border-radius: 3px;
-    }
-
-.category-button {
-    flex: 0 0 auto;
-    background-color: #c6e48b;
-    border: 2px solid #444;
-    border-radius: 20px;
+    gap: 20px;
     padding: 10px 20px;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color 0.3s ease;
+    border-bottom: 1px solid #ccc;
+    overflow-x: auto;
 }
 
-    .category-button:hover {
-        background-color: #92d050;
+.category-label {
+    cursor: pointer;
+    font-size: 15px;
+    padding-bottom: 5px;
+    color: #333;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.3s ease, color 0.3s ease;
+}
+
+    .category-label:hover {
+        color: #FF6F00;
     }
+
+.active-category {
+    color: #FF6F00;
+    font-weight: bold;
+    border-bottom: 2px solid #FF6F00;
+}
 
 /* FOOD ITEMS */
 .food-grid {
@@ -212,6 +262,7 @@ body {
     height: 250px; /* consistent height for all cards */
     cursor: pointer; /* Makes it obvious it's clickable */
 }
+
     .food-card:hover {
         transform: translateY(-5px); /* Slight lift */
         box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
@@ -270,7 +321,7 @@ body {
     padding: 20px;
     border-radius: 15px;
     max-width: 500px;
-    width: 300px;
+    width: 350px;
     height: 400px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     text-align: center;
@@ -283,9 +334,10 @@ body {
 .popup-top {
     flex-grow: 1; /* Allow content above footer to take up space */
 }
-    .popup-content p{
-        font-size: 15px;
-    }
+
+.popup-content p {
+    font-size: 15px;
+}
 
 .popup-img {
     max-width: 50%;
@@ -299,6 +351,7 @@ body {
     font-weight: bold;
     color: black;
 }
+
 .popup-info {
     font-size: 14px;
     color: black;
@@ -314,6 +367,29 @@ body {
     cursor: pointer;
     color: #999;
 }
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+    font-size: 16px;
+    margin: 0 8px;
+    padding: 5px;
+    border: none;
+    background: none;
+}
+/* Remove number input spinners for Chrome, Safari, Edge */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove number input spinners for Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+
 /* Footer sticks to bottom */
 .popup-footer {
     display: flex;
@@ -394,6 +470,7 @@ body {
         opacity: 1;
         transition: opacity 0.5s ease-in-out;
     }
+
 .food-detail-overlay {
     position: fixed;
     top: 0;
