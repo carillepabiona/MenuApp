@@ -22,7 +22,7 @@
         <Nullable>enable</Nullable>
 
         <!-- Display name -->
-        <ApplicationTitle>Ordering App</ApplicationTitle>
+        <ApplicationTitle>DigiDine</ApplicationTitle>
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.menuapp</ApplicationId>
