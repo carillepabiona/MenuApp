@@ -1,5 +1,9 @@
-﻿html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿* {
+    font-family: "Ubuntu", sans-serif;
+}
+
+html, body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 a, .btn-link {
