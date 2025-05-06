@@ -163,15 +163,6 @@
         SearchFood(); // 👈 Add this line to trigger filtering
     }
 
-    private void ShowSearchBox()
-    {
-        JS.InvokeVoidAsync("showSearchBox");
-    }
-
-    private void HideSearchBox()
-    {
-        JS.InvokeVoidAsync("hideSearchBox");
-    }
 
     private void ClearSearch()
     {
@@ -208,7 +199,6 @@
 
     private void ShowAllItems()
     {
-        searchText = string.Empty;
         FilteredFoodItems = FoodItems;
     }
     private FoodItem? SelectedFoodItem;
@@ -223,8 +213,6 @@
         SelectedFoodItem = null;
     }
 
-
-    private int SelectedQuantity = 1;
     [Inject] private NavigationManager Nav { get; set; }
     [Inject] private DatabaseService DB { get; set; }
 
